@@ -49,11 +49,29 @@ static int tiny_parse_value(tiny_context *c, tiny_value *v)
 int tiny_parse(tiny_value *v, const char *json)
 {
     tiny_context c;
+    int ret;
     assert(NULL != v);
+
+    /* 应保持值合法 */
+    v->type = TINY_NULL;
+    /** TODO： 接口设计角度，是否需要做这个检查？
+     *  不做，脏值可能会影响结果
+     *  是否应该作为调用者的要求？
+     */
+    if (NULL == json)
+        return TINY_PARSE_INVALID_VALUE;
     c.json = json;
-    v->type = TINY_BUTT;
     tiny_parse_whitspace(&c);
-    return tiny_parse_value(&c, v);
+    if ((ret = tiny_parse_value(&c, v)) == TINY_PARSE_OK)
+    {
+        tiny_parse_whitspace(&c);
+        if ('\0' != c.json[0])
+        {
+            ret = TINY_PARSE_ROOT_NOT_SINGULAR;
+            v->type = TINY_NULL;
+        }
+    }
+    return ret;
 }
 
 tiny_type tiny_get_value(const tiny_value *v)

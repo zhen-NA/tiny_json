@@ -22,16 +22,59 @@ static int test_pass = 0;
 static void test_parse_null()
 {
     tiny_value v;
-    int ret = TINY_PARSE_OK;
+
+    /* 应该保持是一个合法的值 */
     v.type = TINY_NULL;
-    ret = tiny_parse(&v, "null");
-    EXPECT_EQ_INT(TINY_PARSE_OK, ret);
+    EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "null"));
     EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
+}
+
+static void test_expect_value()
+{
+    tiny_value v;
+
+    v.type = TINY_NULL;
+    EXPECT_EQ_INT(TINY_PARSE_EXPECT_VALUE, tiny_parse(&v, ""));
+    EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
+
+    v.type = TINY_NULL;
+    EXPECT_EQ_INT(TINY_PARSE_EXPECT_VALUE, tiny_parse(&v, " "));
+    EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
+}
+
+static void test_parse_invalid_value()
+{
+    tiny_value v;
+
+    v.type = TINY_NULL;
+    EXPECT_EQ_INT(TINY_PARSE_INVALID_VALUE, tiny_parse(&v, "nul"));
+    EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
+
+    v.type = TINY_NULL;
+    EXPECT_EQ_INT(TINY_PARSE_INVALID_VALUE, tiny_parse(&v, "v"));
+    EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
+}
+
+static void test_parse_root_not_singular()
+{
+    tiny_value v;
+
+    v.type = TINY_NULL;
+    EXPECT_EQ_INT(TINY_PARSE_ROOT_NOT_SINGULAR, tiny_parse(&v, "null x"));
+    EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
+}
+
+static void test_parse()
+{
+    test_parse_null();
+    test_expect_value();
+    test_parse_invalid_value();
+    test_parse_root_not_singular();
 }
 
 int main(int argc, char const *argv[])
 {
-    test_parse_null();
+    test_parse();
     printf("result: %s, %d / %d, pass: %3.2f%%\n", main_ret == 0 ? "pass" : "fail", test_pass, test_count, test_pass * 100.0 / test_count);
     return main_ret;
 }
