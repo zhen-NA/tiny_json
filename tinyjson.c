@@ -31,6 +31,30 @@ static int tiny_parse_null(tiny_context *c, tiny_value *v)
     return TINY_PARSE_OK;
 }
 
+static int tiny_parse_true(tiny_context *c, tiny_value *v)
+{
+    assert('t' == c->json[0]);
+
+    if (c->json[1] != 'r' || c->json[2] != 'u' || c->json[3] != 'e')
+        return TINY_PARSE_INVALID_VALUE;
+
+    c->json += 4; /* sizeof(true) */
+    v->type = TINY_TRUE;
+    return TINY_PARSE_OK;
+}
+
+static int tiny_parse_false(tiny_context *c, tiny_value *v)
+{
+    assert('f' == c->json[0]);
+
+    if (c->json[1] != 'a' || c->json[2] != 'l' || c->json[3] != 's' || c->json[4] != 'e')
+        return TINY_PARSE_INVALID_VALUE;
+
+    c->json += 5; /* sizeof(false) */
+    v->type = TINY_FALSE;
+    return TINY_PARSE_OK;
+}
+
 static int tiny_parse_value(tiny_context *c, tiny_value *v)
 {
     assert(!is_whitspace(*c->json));
@@ -39,6 +63,10 @@ static int tiny_parse_value(tiny_context *c, tiny_value *v)
     {
     case 'n':
         return tiny_parse_null(c, v);
+    case 't':
+        return tiny_parse_true(c, v);
+    case 'f':
+        return tiny_parse_false(c, v);
     case '\0':
         return TINY_PARSE_EXPECT_VALUE;
     default:

@@ -29,6 +29,24 @@ static void test_parse_null()
     EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
 }
 
+static void test_parse_true()
+{
+    tiny_value v;
+
+    v.type = TINY_NULL;
+    EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "true"));
+    EXPECT_EQ_INT(TINY_TRUE, tiny_get_value(&v));
+}
+
+static void test_parse_false()
+{
+    tiny_value v;
+
+    v.type =TINY_NULL;
+    EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "false"));
+    EXPECT_EQ_INT(TINY_FALSE, tiny_get_value(&v));
+}
+
 static void test_expect_value()
 {
     tiny_value v;
@@ -67,6 +85,9 @@ static void test_parse_root_not_singular()
 static void test_parse()
 {
     test_parse_null();
+    test_parse_true();
+    test_parse_false();
+
     test_expect_value();
     test_parse_invalid_value();
     test_parse_root_not_singular();
