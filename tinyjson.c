@@ -102,8 +102,14 @@ int tiny_parse(tiny_value *v, const char *json)
     return ret;
 }
 
-tiny_type tiny_get_value(const tiny_value *v)
+tiny_type tiny_get_type(const tiny_value *v)
 {
     assert(NULL != v);
     return v->type;
+}
+
+double tiny_get_number(const tiny_value *v)
+{
+    assert(v != NULL && v->type == TINY_NUMBER);
+    return v->number;
 }
