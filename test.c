@@ -23,8 +23,7 @@ static void test_parse_null()
 {
     tiny_value v;
 
-    /* 应该保持是一个合法的值 */
-    v.type = TINY_NULL;
+    v.type = TINY_FALSE; /* 初值应该与TINY_NULL不同 */
     EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "null"));
     EXPECT_EQ_INT(TINY_NULL, tiny_get_value(&v));
 }
@@ -42,7 +41,7 @@ static void test_parse_false()
 {
     tiny_value v;
 
-    v.type =TINY_NULL;
+    v.type = TINY_NULL;
     EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "false"));
     EXPECT_EQ_INT(TINY_FALSE, tiny_get_value(&v));
 }
