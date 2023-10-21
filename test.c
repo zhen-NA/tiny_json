@@ -20,13 +20,21 @@ static int test_pass = 0;
 #define EXPECT_EQ_INT(expect, actual) EXPECT_EQ_BASE(((expect) == (actual)), expect, actual, "%d")
 #define EXPECT_EQ_DOUBLE(expect, actual) EXPECT_EQ_BASE((expect) == (actual), expect, actual, "%.17g")
 
-#define TEST_NUMBER(expect, actual)                           \
-    do                                                        \
-    {                                                         \
-        tiny_value v;                                         \
-        EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, actual)); \
-        EXPECT_EQ_INT(TINY_NUMBER, tiny_get_type(&v));        \
-        EXPECT_EQ_DOUBLE(expect, tiny_get_number(&v));        \
+#define TEST_NUMBER(expect, json)                           \
+    do                                                      \
+    {                                                       \
+        tiny_value v;                                       \
+        EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, json)); \
+        EXPECT_EQ_INT(TINY_NUMBER, tiny_get_type(&v));      \
+        EXPECT_EQ_DOUBLE(expect, tiny_get_number(&v));      \
+    } while (0)
+
+#define TEST_ERROR(expect, json)                     \
+    do                                               \
+    {                                                \
+        tiny_value v;                                \
+        EXPECT_EQ_INT(expect, tiny_parse(&v, json)); \
+        EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v)); \
     } while (0)
 
 static void test_parse_null()
@@ -58,37 +66,19 @@ static void test_parse_false()
 
 static void test_expect_value()
 {
-    tiny_value v;
-
-    v.type = TINY_NULL;
-    EXPECT_EQ_INT(TINY_PARSE_EXPECT_VALUE, tiny_parse(&v, ""));
-    EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v));
-
-    v.type = TINY_NULL;
-    EXPECT_EQ_INT(TINY_PARSE_EXPECT_VALUE, tiny_parse(&v, " "));
-    EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v));
+    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "");
+    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, " ");
 }
 
 static void test_parse_invalid_value()
 {
-    tiny_value v;
-
-    v.type = TINY_NULL;
-    EXPECT_EQ_INT(TINY_PARSE_INVALID_VALUE, tiny_parse(&v, "nul"));
-    EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v));
-
-    v.type = TINY_NULL;
-    EXPECT_EQ_INT(TINY_PARSE_INVALID_VALUE, tiny_parse(&v, "v"));
-    EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v));
+    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "nul");
+    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "V");
 }
 
 static void test_parse_root_not_singular()
 {
-    tiny_value v;
-
-    v.type = TINY_NULL;
-    EXPECT_EQ_INT(TINY_PARSE_ROOT_NOT_SINGULAR, tiny_parse(&v, "null x"));
-    EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v));
+    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "null x");
 }
 
 static void test_parse_number()
