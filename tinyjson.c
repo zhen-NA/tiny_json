@@ -71,7 +71,7 @@ static int tiny_parse_check_number(tiny_context *c)
     else
     {
         if (!IS_DIGIT_1TO9(*p))
-            return TINY_PARSE_INVALID_VALUE;
+            return 0;
         for (p++; IS_DIGIT_1TO9(*p); p++)
             ;
     }
@@ -79,7 +79,7 @@ static int tiny_parse_check_number(tiny_context *c)
     {
         p++;
         if (!IS_DIGIT(*p))
-            return TINY_PARSE_INVALID_VALUE;
+            return 0;
         for (p++; IS_DIGIT(*p); p++)
             ;
     }
@@ -89,7 +89,7 @@ static int tiny_parse_check_number(tiny_context *c)
         if (*p == '+' || *p == '-')
             p++;
         if (!IS_DIGIT(*p))
-            return TINY_PARSE_INVALID_VALUE;
+            return 0;
         for (p++; IS_DIGIT(*p); p++)
             ;
     }
