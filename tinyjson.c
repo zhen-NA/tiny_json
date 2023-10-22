@@ -8,7 +8,7 @@
 
 #define is_whitspace(c) (c == ' ' || c == '\t' || c == '\n' || c == '\r')
 #define IS_DIGIT(ch) ((ch) >= '0' && (ch) <= '9')
-#define IS_DIGIT_1TO9(ch) ((ch) >= '0' && (ch) <= '9')
+#define IS_DIGIT_1TO9(ch) ((ch) >= '1' && (ch) <= '9')
 
 typedef struct
 {
@@ -66,7 +66,7 @@ static int tiny_parse_check_number(tiny_context *c)
     const char *p = c->json;
     if (*p == '-')
         p++;
-    if (*p == 0)
+    if (*p == '0')
         p++;
     else
     {
