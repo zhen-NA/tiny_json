@@ -7,4 +7,6 @@ endif()
 
 add_library(tinyjson tinyjson.c)
 add_executable(tinyjson_test test.c)
+add_executable(tinyjson_debug test_debug.c)
 target_link_libraries(tinyjson_test tinyjson)
+target_link_libraries(tinyjson_debug tinyjson)
