@@ -64,23 +64,6 @@ static void test_parse_false()
     EXPECT_EQ_INT(TINY_FALSE, tiny_get_type(&v));
 }
 
-static void test_expect_value()
-{
-    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "");
-    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, " ");
-}
-
-static void test_parse_invalid_value()
-{
-    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "nul");
-    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "V");
-}
-
-static void test_parse_root_not_singular()
-{
-    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "null x");
-}
-
 static void test_parse_number()
 {
     TEST_NUMBER(0.0, "0");
@@ -104,6 +87,44 @@ static void test_parse_number()
     TEST_NUMBER(0.0, "1e-10000"); /* must underflow */
 }
 
+static void test_expect_value()
+{
+    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, "");
+    TEST_ERROR(TINY_PARSE_EXPECT_VALUE, " ");
+}
+
+static void test_parse_invalid_value()
+{
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "nul");
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "V");
+
+    /* invalid number */
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "+0");
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "+1");
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, ".123"); /* at least one digit before '.' */
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "1.");   /* at least one digit after '.' */
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "INF");
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "inf");
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "NAN");
+    TEST_ERROR(TINY_PARSE_INVALID_VALUE, "nan");
+}
+
+static void test_parse_root_not_singular()
+{
+    TEST_ERROR(TINY_PARSE_ROOT_NOT_SINGULAR, "null x");
+
+    /* invalid number */
+    TEST_ERROR(TINY_PARSE_ROOT_NOT_SINGULAR, "0123"); /* after zero should be '.' or nothing */
+    TEST_ERROR(TINY_PARSE_ROOT_NOT_SINGULAR, "0x0");
+    TEST_ERROR(TINY_PARSE_ROOT_NOT_SINGULAR, "0x123");
+}
+
+static void test_parse_number_too_big() {
+    TEST_ERROR(TINY_PARSE_NUMBER_TOO_BIG, "1e309");
+    TEST_ERROR(TINY_PARSE_NUMBER_TOO_BIG, "-1e309");
+}
+
+
 static void test_parse()
 {
     test_parse_null();
@@ -114,6 +135,7 @@ static void test_parse()
     test_expect_value();
     test_parse_invalid_value();
     test_parse_root_not_singular();
+    test_parse_number_too_big();
 }
 
 int main(int argc, char const *argv[])

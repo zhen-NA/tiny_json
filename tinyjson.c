@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <math.h>
 
 #include "tinyjson.h"
 
 #define is_whitspace(c) (c == ' ' || c == '\t' || c == '\n' || c == '\r')
+#define IS_DIGIT(ch) ((ch) >= '0' && (ch) <= '9')
+#define IS_DIGIT_1TO9(ch) ((ch) >= '0' && (ch) <= '9')
 
 typedef struct
 {
@@ -55,6 +60,60 @@ static int tiny_parse_false(tiny_context *c, tiny_value *v)
     return TINY_PARSE_OK;
 }
 
+/* 返回数字域的长度，0表示失败*/
+static int tiny_parse_check_number(tiny_context *c)
+{
+    const char *p = c->json;
+    if (*p == '-')
+        p++;
+    if (*p == 0)
+        p++;
+    else
+    {
+        if (!IS_DIGIT_1TO9(*p))
+            return TINY_PARSE_INVALID_VALUE;
+        for (p++; IS_DIGIT_1TO9(*p); p++)
+            ;
+    }
+    if (*p == '.')
+    {
+        p++;
+        if (!IS_DIGIT(*p))
+            return TINY_PARSE_INVALID_VALUE;
+        for (p++; IS_DIGIT(*p); p++)
+            ;
+    }
+    if (*p == 'e' || *p == 'E')
+    {
+        p++;
+        if (*p == '+' || *p == '-')
+            p++;
+        if (!IS_DIGIT(*p))
+            return TINY_PARSE_INVALID_VALUE;
+        for (p++; IS_DIGIT(*p); p++)
+            ;
+    }
+
+    return p - c->json;
+}
+
+static int tiny_parse_number(tiny_context *c, tiny_value *v)
+{
+    /* 数字域的长度 */
+    int n = tiny_parse_check_number(c);
+    if (!n)
+        return TINY_PARSE_INVALID_VALUE;
+
+    errno = 0;
+    v->number = strtod(c->json, NULL);
+    if (errno == ERANGE && (v->number == HUGE_VAL || v->number == -HUGE_VAL))
+        return TINY_PARSE_NUMBER_TOO_BIG;
+
+    v->type = TINY_NUMBER;
+    c->json += n;
+    return TINY_PARSE_OK;
+}
+
 static int tiny_parse_value(tiny_context *c, tiny_value *v)
 {
     assert(!is_whitspace(*c->json));
@@ -70,7 +129,8 @@ static int tiny_parse_value(tiny_context *c, tiny_value *v)
     case '\0':
         return TINY_PARSE_EXPECT_VALUE;
     default:
-        return TINY_PARSE_INVALID_VALUE;
+        /* number类型判断相对复杂，默认都按照数字处理，数字类型的检查放到数字的解析函数中完成 */
+        return tiny_parse_number(c, v);
     }
 }
 
