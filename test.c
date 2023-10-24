@@ -92,12 +92,19 @@ static void test_parse_number_too_big()
     TEST_ERROR(TINY_PARSE_NUMBER_TOO_BIG, "-1e309");
 }
 
+static void test_parse_string()
+{
+    TEST_STRING("", "\"\"");
+    TEST_STRING("Hello", "\"Hello\"");
+}
+
 static void test_parse()
 {
     test_parse_null();
     test_parse_true();
     test_parse_false();
     test_parse_number();
+    test_parse_string();
 
     test_expect_value();
     test_parse_invalid_value();

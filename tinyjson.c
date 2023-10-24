@@ -173,3 +173,18 @@ double tiny_get_number(const tiny_value *v)
     assert(v != NULL && v->type == TINY_NUMBER);
     return v->number;
 }
+
+char *tiny_get_string(tiny_value *v)
+{
+    return NULL;
+}
+
+size_t tiny_get_string_length(tiny_value *v)
+{
+    return 0;
+}
+
+void tiny_free(tiny_value *v)
+{
+    return;
+}
