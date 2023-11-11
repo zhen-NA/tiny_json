@@ -13,8 +13,17 @@ typedef enum
 
 typedef struct
 {
+    union
+    {
+        double n;
+        struct
+        {
+            char *s;
+            size_t len;
+        } s;
+
+    } u;
     tiny_type type;
-    double number;
 } tiny_value;
 
 enum
@@ -24,6 +33,7 @@ enum
     TINY_PARSE_INVALID_VALUE,
     TINY_PARSE_ROOT_NOT_SINGULAR,
     TINY_PARSE_NUMBER_TOO_BIG,
+    TINY_PARSE_MISS_QUOTATION_MARK,
     TINY_PARSE_BUTT
 };
 
@@ -42,5 +52,9 @@ double tiny_get_number(const tiny_value *v);
 size_t tiny_get_string_length(tiny_value *v);
 
 void tiny_free(tiny_value *v);
+
+void tiny_set_string(tiny_value *v, const char *s, size_t len);
+
+char *tiny_get_string(tiny_value *v);
 
 #endif /* __TINYJSON_H_ */
