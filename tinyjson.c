@@ -239,24 +239,6 @@ tiny_type tiny_get_type(const tiny_value *v)
     return v->type;
 }
 
-double tiny_get_number(const tiny_value *v)
-{
-    assert(v != NULL && v->type == TINY_NUMBER);
-    return v->u.n;
-}
-
-char *tiny_get_string(tiny_value *v)
-{
-    assert(v != NULL && v->type == TINY_STRING);
-    return v->u.s.s;
-}
-
-size_t tiny_get_string_length(tiny_value *v)
-{
-    assert(v != NULL && v->type == TINY_STRING);
-    return v->u.s.len;
-}
-
 void tiny_free(tiny_value *v)
 {
     assert(v != NULL);
@@ -264,6 +246,31 @@ void tiny_free(tiny_value *v)
         free(v->u.s.s);
     v->type =TINY_NULL;
     return;
+}
+
+void tiny_set_boolean(tiny_value *v, int b)
+{
+    tiny_free(v);
+    v->type = b ? TINY_TRUE : TINY_FALSE;
+}
+
+int tiny_get_boolean(tiny_value *v)
+{
+    assert(v != NULL && (v->type == TINY_TRUE || v->type == TINY_FALSE));
+    return v->type == TINY_TRUE;
+}
+
+void tiny_set_number(tiny_value *v, double n)
+{
+    tiny_free(v);
+    v->u.n = n;
+    v->type = TINY_NUMBER;
+}
+
+double tiny_get_number(const tiny_value *v)
+{
+    assert(v != NULL && v->type == TINY_NUMBER);
+    return v->u.n;
 }
 
 void tiny_set_string(tiny_value *v, const char *s, size_t len)
@@ -276,4 +283,16 @@ void tiny_set_string(tiny_value *v, const char *s, size_t len)
     v->u.s.s[len] = '\0';
     v->type = TINY_STRING;
     return;
+}
+
+char *tiny_get_string(tiny_value *v)
+{
+    assert(v != NULL && v->type == TINY_STRING);
+    return v->u.s.s;
+}
+
+size_t tiny_get_string_length(tiny_value *v)
+{
+    assert(v != NULL && v->type == TINY_STRING);
+    return v->u.s.len;
 }
