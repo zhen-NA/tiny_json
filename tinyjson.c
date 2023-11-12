@@ -176,7 +176,7 @@ static int tiny_parse_string(tiny_context *c, tiny_value *v)
             c->json = p;
             return TINY_PARSE_OK;
         case '\0':
-            v->type = TINY_NULL;
+            c->top = 0;
             return TINY_PARSE_MISS_QUOTATION_MARK;
         default:
             PUSHC(c, ch);
@@ -219,7 +219,7 @@ int tiny_parse(tiny_value *v, const char *json)
     c.json = json;
     c.stack = NULL;
     c.size = c.top = 0;
-
+    tiny_init(v);
     tiny_parse_whitspace(&c);
     if ((ret = tiny_parse_value(&c, v)) == TINY_PARSE_OK)
     {
@@ -230,6 +230,8 @@ int tiny_parse(tiny_value *v, const char *json)
             v->type = TINY_NULL;
         }
     }
+    assert(c.top == 0);
+    free(c.stack);
     return ret;
 }
 
