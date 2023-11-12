@@ -7,28 +7,29 @@ static int test_pass = 0;
 static void test_parse_null()
 {
     tiny_value v;
-
-    v.type = TINY_FALSE; /* 初值应该与TINY_NULL不同 */
+    tiny_init(&v);
+    tiny_set_boolean(&v, 1);
     EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "null"));
     EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v));
+    tiny_free(&v);
 }
 
 static void test_parse_true()
 {
     tiny_value v;
-
-    v.type = TINY_NULL;
+    tiny_init(&v);
     EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "true"));
     EXPECT_EQ_INT(TINY_TRUE, tiny_get_type(&v));
+    tiny_free(&v);
 }
 
 static void test_parse_false()
 {
     tiny_value v;
-
-    v.type = TINY_NULL;
+    tiny_init(&v);
     EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, "false"));
     EXPECT_EQ_INT(TINY_FALSE, tiny_get_type(&v));
+    tiny_free(&v);
 }
 
 static void test_parse_number()

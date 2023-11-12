@@ -27,17 +27,21 @@
     do                                                      \
     {                                                       \
         tiny_value v;                                       \
+        tiny_init(&v);                                      \
         EXPECT_EQ_INT(TINY_PARSE_OK, tiny_parse(&v, json)); \
         EXPECT_EQ_INT(TINY_NUMBER, tiny_get_type(&v));      \
         EXPECT_EQ_DOUBLE(expect, tiny_get_number(&v));      \
+        tiny_free(&v);                                      \
     } while (0)
 
 #define TEST_ERROR(expect, json)                     \
     do                                               \
     {                                                \
         tiny_value v;                                \
+        tiny_init(&v);                               \
         EXPECT_EQ_INT(expect, tiny_parse(&v, json)); \
         EXPECT_EQ_INT(TINY_NULL, tiny_get_type(&v)); \
+        tiny_free(&v);                               \
     } while (0)
 
 #define TEST_STRING(expect, json)                                                  \
